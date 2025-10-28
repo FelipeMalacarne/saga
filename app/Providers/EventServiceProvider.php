@@ -4,30 +4,37 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Events\Transaction\TransactionCreated;
-use App\Listeners\UpdateAccountBalanceListener;
+use App\Events\AntiFraudApproved;
+use App\Events\FundsReserved;
+use App\Events\ReservationReleased;
+use App\Events\TransferRejected;
+use App\Events\TransferRequested;
+use App\Events\TransferSettled;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * The event to listener mappings for the application.
-     *
-     * @var array<class-string, array<int, class-string>>
-     */
     protected $listen = [
-        // TransactionCreated::class => [
-        //     UpdateAccountBalanceListener::class,
-        // ],
-    ];
+        TransferRequested::class => [
+            //
+        ],
+        FundsReserved::class => [
+            //
+        ],
+        ReservationReleased::class => [
+            //
+        ],
+        TransferRejected::class => [
+            //
+        ],
+        AntiFraudApproved::class => [
+            //
+        ],
+        TransferSettled::class => [
+            //
+        ],
 
-    /**
-     * Register any events for your application.
-     */
-    public function boot(): void
-    {
-        //
-    }
+    ];
 
     public function shouldDiscoverEvents(): bool
     {
