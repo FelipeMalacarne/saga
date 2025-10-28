@@ -46,7 +46,7 @@ return [
         'wallet' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),
-            'host' => env('WALLET_DB_HOST', '127.0.0.1'),
+            'host' => env('WALLET_DB_HOST'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('WALLET_DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
