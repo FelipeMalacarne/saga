@@ -20,19 +20,19 @@ class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
         TransferRequested::class => [
-            ReserveFunds::class,
+            // ReserveFunds::class,
         ],
         FundsReserved::class => [
-            AntiFraudCheck::class,
+            // AntiFraudCheck::class,
         ],
         ReservationReleased::class => [
             //
         ],
         AntiFraudRejected::class => [
-            ReleaseFunds::class,
+            // ReleaseFunds::class,
         ],
         AntiFraudApproved::class => [
-            SettleTransfer::class,
+            // SettleTransfer::class,
         ],
         TransferSettled::class => [
             //
