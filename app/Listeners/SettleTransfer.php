@@ -22,9 +22,6 @@ class SettleTransfer
             Wallet::whereKey($tx->to_wallet_id)
                 ->increment('balance', $tx->amount);
 
-            $tx->status = TransferStatus::SETTLED;
-            $tx->save();
-
             event(new TransferSettled(
                 txId: $tx->id,
                 fromWalletId: $tx->from_wallet_id,
@@ -34,5 +31,8 @@ class SettleTransfer
 
             Log::info("Transfer settled: txId={$tx->id}");
         });
+
+        $tx->status = TransferStatus::SETTLED;
+        $tx->save();
     }
 }

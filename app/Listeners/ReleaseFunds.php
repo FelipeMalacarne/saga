@@ -15,7 +15,6 @@ class ReleaseFunds
     {
         Log::info("Releasing funds for transaction {$event->txId} due to anti-fraud rejection.");
         $tx = Transfer::find($event->txId);
-        logger($tx);
 
         DB::connection('wallet')->transaction(function () use ($tx) {
 
