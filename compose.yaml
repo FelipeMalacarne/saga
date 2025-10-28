@@ -4,83 +4,169 @@ services:
             context: ./docker/8.4
             dockerfile: Dockerfile
             args:
-                WWWGROUP: '${WWWGROUP}'
+                WWWGROUP: "${WWWGROUP}"
         image: saga/app
         extra_hosts:
-            - 'host.docker.internal:host-gateway'
+            - "host.docker.internal:host-gateway"
         ports:
-            - '${APP_PORT:-80}:80'
-            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+            - "${APP_PORT:-80}:80"
         environment:
-            WWWUSER: '${WWWUSER}'
+            WWWUSER: "${WWWUSER}"
             LARAVEL_SAIL: 1
-            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
-            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
-            IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
-            - '.:/var/www/html'
-        networks:
-            - sail
+            - ".:/var/www/html"
         depends_on:
-            - pgsql-wallet
-            - pgsql-transfer
-            - redis
+            pgsql-wallet:
+                condition: service_healthy
+            pgsql-transfer:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            migrate:
+                condition: service_completed_successfully
+            composer:
+                condition: service_completed_successfully
+
+    worker-wallets:
+        build:
+            context: ./docker/8.4
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: "${WWWGROUP}"
+        image: saga/app
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        command: artisan queue:listen --queue=wallets
+        environment:
+            WWWUSER: "${WWWUSER}"
+            LARAVEL_SAIL: 1
+        volumes:
+            - ".:/var/www/html"
+        depends_on:
+            pgsql-wallet:
+                condition: service_healthy
+            pgsql-transfer:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            migrate:
+                condition: service_completed_successfully
+            composer:
+                condition: service_completed_successfully
+
+    worker-transfers:
+        build:
+            context: ./docker/8.4
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: "${WWWGROUP}"
+        image: saga/app
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        environment:
+            WWWUSER: "${WWWUSER}"
+            LARAVEL_SAIL: 1
+        command: artisan queue:listen --queue=transfers
+        volumes:
+            - ".:/var/www/html"
+        depends_on:
+            pgsql-wallet:
+                condition: service_healthy
+            pgsql-transfer:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            migrate:
+                condition: service_completed_successfully
+            composer:
+                condition: service_completed_successfully
+
+    composer:
+        build:
+            context: ./docker/8.4
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: "${WWWGROUP}"
+        image: saga/app
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        environment:
+            WWWUSER: "${WWWUSER}"
+            LARAVEL_SAIL: 1
+        command: composer install
+        volumes:
+            - ".:/var/www/html"
+
+    migrate:
+        build:
+            context: ./docker/8.4
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: "${WWWGROUP}"
+        image: saga/app
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        environment:
+            WWWUSER: "${WWWUSER}"
+            LARAVEL_SAIL: 1
+        command: php artisan migrate
+        volumes:
+            - ".:/var/www/html"
+        depends_on:
+            pgsql-wallet:
+                condition: service_healthy
+            pgsql-transfer:
+                condition: service_healthy
+            composer:
+                condition: service_completed_successfully
 
     pgsql-wallet:
-        image: 'postgres:17-alpine'
+        image: "postgres:17-alpine"
         environment:
-            PGPASSWORD: '${DB_PASSWORD:-secret}'
-            POSTGRES_DB: 'wallet'
-            POSTGRES_USER: '${DB_USERNAME}'
-            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+            PGPASSWORD: "${DB_PASSWORD:-secret}"
+            POSTGRES_DB: "wallet"
+            POSTGRES_USER: "${DB_USERNAME}"
+            POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
         volumes:
-            - 'wallet-data:/var/lib/postgresql/data'
-            - './docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
-        networks:
-            - sail
+            - "wallet-data:/var/lib/postgresql/data"
+            - "./docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql"
         healthcheck:
             test:
                 - CMD
                 - pg_isready
-                - '-q'
-                - '-d'
-                - 'wallet'
-                - '-U'
-                - '${DB_USERNAME}'
+                - "-q"
+                - "-d"
+                - "wallet"
+                - "-U"
+                - "${DB_USERNAME}"
             retries: 3
             timeout: 5s
 
     pgsql-transfer:
-        image: 'postgres:17-alpine'
+        image: "postgres:17-alpine"
         environment:
-            PGPASSWORD: '${DB_PASSWORD:-secret}'
-            POSTGRES_DB: 'transfer'
-            POSTGRES_USER: '${DB_USERNAME}'
-            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+            PGPASSWORD: "${DB_PASSWORD:-secret}"
+            POSTGRES_DB: "transfer"
+            POSTGRES_USER: "${DB_USERNAME}"
+            POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
         volumes:
-            - 'transfer-data:/var/lib/postgresql/data'
-            - './docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
-        networks:
-            - sail
+            - "transfer-data:/var/lib/postgresql/data"
+            - "./docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql"
         healthcheck:
             test:
                 - CMD
                 - pg_isready
-                - '-q'
-                - '-d'
-                - 'transfer'
-                - '-U'
-                - '${DB_USERNAME}'
+                - "-q"
+                - "-d"
+                - "transfer"
+                - "-U"
+                - "${DB_USERNAME}"
             retries: 3
             timeout: 5s
     redis:
-        image: 'redis:alpine'
-        ports:
-            - '${FORWARD_REDIS_PORT:-6379}:6379'
+        image: "redis:alpine"
         volumes:
-            - 'redis-data:/data'
-        networks:
-            - sail
+            - "redis-data:/data"
         healthcheck:
             test:
                 - CMD
@@ -88,9 +174,6 @@ services:
                 - ping
             retries: 3
             timeout: 5s
-networks:
-    sail:
-        driver: bridge
 volumes:
     wallet-data:
         driver: local
