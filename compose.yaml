@@ -1,11 +1,11 @@
 services:
-    laravel.test:
+    laravel:
         build:
             context: ./vendor/laravel/sail/runtimes/8.4
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
-        image: sail-8.4/app
+        image: saga/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -24,6 +24,7 @@ services:
         depends_on:
             - pgsql-wallet
             - pgsql-transfer
+            - redis
 
     pgsql-wallet:
         image: 'postgres:17-alpine'
@@ -72,7 +73,21 @@ services:
                 - '${DB_USERNAME}'
             retries: 3
             timeout: 5s
-
+    redis:
+        image: 'redis:alpine'
+        ports:
+            - '${FORWARD_REDIS_PORT:-6379}:6379'
+        volumes:
+            - 'redis-data:/data'
+        networks:
+            - sail
+        healthcheck:
+            test:
+                - CMD
+                - redis-cli
+                - ping
+            retries: 3
+            timeout: 5s
 networks:
     sail:
         driver: bridge
@@ -80,4 +95,6 @@ volumes:
     wallet-data:
         driver: local
     transfer-data:
+        driver: local
+    redis-data:
         driver: local
