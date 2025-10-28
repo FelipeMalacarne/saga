@@ -12,6 +12,8 @@ class ReserveFunds
 {
     public function handle(TransferRequested $event): void
     {
+        Log::info("Reserving funds for transfer {$event->txId}");
+
         DB::connection('wallet')->transaction(function () use ($event) {
             $wallet = Wallet::findOrFail($event->fromWalletId);
             if ($wallet->balance < $event->amount) {

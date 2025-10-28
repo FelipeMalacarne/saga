@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Events\AntiFraudApproved;
+use App\Events\AntiFraudRejected;
 use App\Events\FundsReserved;
 use App\Events\ReservationReleased;
-use App\Events\TransferRejected;
 use App\Events\TransferRequested;
 use App\Events\TransferSettled;
+use App\Listeners\AntiFraudCheck;
 use App\Listeners\ReserveFunds;
+use App\Listeners\SettleTransfer;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -20,16 +22,16 @@ class EventServiceProvider extends ServiceProvider
             ReserveFunds::class,
         ],
         FundsReserved::class => [
-            //
+            AntiFraudCheck::class,
         ],
         ReservationReleased::class => [
             //
         ],
-        TransferRejected::class => [
+        AntiFraudRejected::class => [
             //
         ],
         AntiFraudApproved::class => [
-            //
+            SettleTransfer::class,
         ],
         TransferSettled::class => [
             //
