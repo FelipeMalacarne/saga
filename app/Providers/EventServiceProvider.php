@@ -11,6 +11,7 @@ use App\Events\ReservationReleased;
 use App\Events\TransferRequested;
 use App\Events\TransferSettled;
 use App\Listeners\AntiFraudCheck;
+use App\Listeners\ReleaseFunds;
 use App\Listeners\ReserveFunds;
 use App\Listeners\SettleTransfer;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -28,7 +29,7 @@ class EventServiceProvider extends ServiceProvider
             //
         ],
         AntiFraudRejected::class => [
-            //
+            ReleaseFunds::class,
         ],
         AntiFraudApproved::class => [
             SettleTransfer::class,
