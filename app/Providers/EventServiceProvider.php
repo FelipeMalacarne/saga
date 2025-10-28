@@ -10,13 +10,14 @@ use App\Events\ReservationReleased;
 use App\Events\TransferRejected;
 use App\Events\TransferRequested;
 use App\Events\TransferSettled;
+use App\Listeners\ReserveFunds;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
         TransferRequested::class => [
-            //
+            ReserveFunds::class,
         ],
         FundsReserved::class => [
             //

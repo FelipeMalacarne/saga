@@ -5,6 +5,7 @@ namespace App\Events;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class TransferRequested
 {
@@ -15,6 +16,7 @@ class TransferRequested
         public string $fromWalletId,
         public string $toWalletId,
         public float $amount
-    ) {}
-
+    ) {
+        Log::info("TransferRequested event created: txId={$txId}, fromWalletId={$fromWalletId}, toWalletId={$toWalletId}, amount={$amount}");
+    }
 }
