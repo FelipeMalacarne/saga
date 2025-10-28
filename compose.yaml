@@ -5,7 +5,8 @@ services:
             dockerfile: Dockerfile
             args:
                 WWWGROUP: "${WWWGROUP}"
-        image: saga/app
+        # image: saga/app
+        image: ghcr.io/felipemalacarne/saga/app
         extra_hosts:
             - "host.docker.internal:host-gateway"
         ports:
@@ -33,7 +34,8 @@ services:
             dockerfile: Dockerfile
             args:
                 WWWGROUP: "${WWWGROUP}"
-        image: saga/app
+        # image: saga/app
+        image: ghcr.io/felipemalacarne/saga/app
         extra_hosts:
             - "host.docker.internal:host-gateway"
         command: php artisan queue:listen --queue=wallets
@@ -60,7 +62,8 @@ services:
             dockerfile: Dockerfile
             args:
                 WWWGROUP: "${WWWGROUP}"
-        image: saga/app
+        # image: saga/app
+        image: ghcr.io/felipemalacarne/saga/app
         extra_hosts:
             - "host.docker.internal:host-gateway"
         environment:
@@ -87,7 +90,8 @@ services:
             dockerfile: Dockerfile
             args:
                 WWWGROUP: "${WWWGROUP}"
-        image: saga/app
+        # image: saga/app
+        image: ghcr.io/felipemalacarne/saga/app
         extra_hosts:
             - "host.docker.internal:host-gateway"
         environment:
@@ -103,7 +107,8 @@ services:
             dockerfile: Dockerfile
             args:
                 WWWGROUP: "${WWWGROUP}"
-        image: saga/app
+        # image: saga/app
+        image: ghcr.io/felipemalacarne/saga/app
         extra_hosts:
             - "host.docker.internal:host-gateway"
         environment:
