@@ -20,6 +20,7 @@ class WalletFactory extends Factory
         return [
             'owner_id' => Str::uuid(),
             'balance' => $this->faker->randomFloat(2, 0, 10000),
+            'name' => $this->faker->word(),
         ];
     }
 }
