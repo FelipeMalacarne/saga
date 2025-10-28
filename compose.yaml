@@ -1,11 +1,11 @@
 services:
     laravel.test:
         build:
-            context: './vendor/laravel/sail/runtimes/8.4'
+            context: ./vendor/laravel/sail/runtimes/8.4
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
-        image: 'sail-8.4/app'
+        image: sail-8.4/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -22,19 +22,18 @@ services:
         networks:
             - sail
         depends_on:
-            - pgsql
-            - redis
-    pgsql:
+            - pgsql-wallet
+            - pgsql-transfer
+
+    pgsql-wallet:
         image: 'postgres:17-alpine'
-        ports:
-            - '${FORWARD_DB_PORT:-5432}:5432'
         environment:
             PGPASSWORD: '${DB_PASSWORD:-secret}'
-            POSTGRES_DB: '${DB_DATABASE}'
+            POSTGRES_DB: 'wallet'
             POSTGRES_USER: '${DB_USERNAME}'
             POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
         volumes:
-            - 'sail-pgsql:/var/lib/postgresql/data'
+            - 'wallet-data:/var/lib/postgresql/data'
             - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
         networks:
             - sail
@@ -44,31 +43,41 @@ services:
                 - pg_isready
                 - '-q'
                 - '-d'
-                - '${DB_DATABASE}'
+                - 'wallet'
                 - '-U'
                 - '${DB_USERNAME}'
             retries: 3
             timeout: 5s
-    redis:
-        image: 'redis:alpine'
-        ports:
-            - '${FORWARD_REDIS_PORT:-6379}:6379'
+
+    pgsql-transfer:
+        image: 'postgres:17-alpine'
+        environment:
+            PGPASSWORD: '${DB_PASSWORD:-secret}'
+            POSTGRES_DB: 'transfer'
+            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
         volumes:
-            - 'sail-redis:/data'
+            - 'transfer-data:/var/lib/postgresql/data'
+            - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
         networks:
             - sail
         healthcheck:
             test:
                 - CMD
-                - redis-cli
-                - ping
+                - pg_isready
+                - '-q'
+                - '-d'
+                - 'transfer'
+                - '-U'
+                - '${DB_USERNAME}'
             retries: 3
             timeout: 5s
+
 networks:
     sail:
         driver: bridge
 volumes:
-    sail-pgsql:
+    wallet-data:
         driver: local
-    sail-redis:
+    transfer-data:
         driver: local
