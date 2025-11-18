@@ -40,6 +40,13 @@ docker compose up
 3. **Acesse a aplicação:**
 A aplicação estará disponível em `http://localhost:80`
 
+4. **Monitoramento e logs**
+   - O Laravel Telescope está disponível em `http://localhost/telescope`.
+   - Para acompanhar os logs em tempo real via Sail, use:
+     ```bash
+     vendor/bin/sail artisan pail
+     ```
+
 ---
 
 ## 🧩 O que é SAGA Pattern?
