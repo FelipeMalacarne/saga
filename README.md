@@ -38,7 +38,7 @@ docker compose up
 > ⚠️ **Nota:** Todo o setup (instalação de dependências, migrations, etc.) é feito automaticamente no build da imagem Docker.
 
 3. **Acesse a aplicação:**
-A aplicação estará disponível em `http://localhost:8000`
+A aplicação estará disponível em `http://localhost:80`
 
 ---
 
